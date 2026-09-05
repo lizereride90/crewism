@@ -71,7 +71,7 @@ async def explore_flow(gid: int, uid: int, display_name: str, send):
         return
     if kind == "boss":
         await send(embed("Heavy aura",
-            "A boss-level presence... check `/bosses` when you're stronger. A street fighter blocks you instead."))
+            "A boss-level presence... check `/boss` when you're stronger. A street fighter blocks you instead."))
         kind = "fighter"
 
     rarity = enc.get("rarity", "Common")

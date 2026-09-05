@@ -36,15 +36,6 @@ class Combat(commands.Cog):
         return [app_commands.Choice(name=label, value=bid)
                 for label, bid in await self._boss_choices(current)]
 
-    @app_commands.command(name="bosses", description="List all bosses")
-    async def bosses(self, interaction: discord.Interaction):
-        async with SessionLocal() as s:
-            r = await s.execute(select(Boss))
-            rows = r.scalars().all()
-        txt = "\n".join(f"{b.name} LV{b.level} ({b.region})" for b in rows)
-        txt += "\n\nFight one with `/boss` — pick from the dropdown."
-        await interaction.response.send_message(embed=embed("Bosses", txt), ephemeral=True)
-
     @app_commands.command(name="boss", description="Fight a boss — pick from the list")
     @app_commands.describe(boss_id="Choose your boss")
     @app_commands.autocomplete(boss_id=boss_autocomplete)
@@ -110,16 +101,6 @@ class Combat(commands.Cog):
         else:
             await interaction.followup.send(embed=embed(f"Fell to {b.name}", lines + extra, color=0xED4245))
 
-
-    # ---- prefix mirrors ----
-
-    @commands.command(name="bosses")
-    async def bosses_prefix(self, ctx: commands.Context):
-        async with SessionLocal() as s:
-            r = await s.execute(select(Boss))
-            rows = r.scalars().all()
-        txt = "\n".join(f"{b.name} LV{b.level} ({b.region})" for b in rows)
-        await ctx.send(embed=embed("Bosses", txt))
 
     @commands.command(name="boss", aliases=["raid"])
     @commands.cooldown(1, 10, commands.BucketType.user)

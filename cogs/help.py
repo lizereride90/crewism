@@ -15,12 +15,12 @@ SECTIONS = {
     "Gambling": "`c!coinflip heads 100`, `c!dice 100`, `c!higherlower 100` (fictional Won)",
     "PvP": "`c!fight @user 100` — ranked pot, bounty up",
     "Quests": "`c!quests`, `c!claim_quest <id>`, `c!events`, `c!generations`, `c!workers`",
-    "Bosses": "`c!bosses`, `c!boss <name>` — phases + cooldowns",
+    "Bosses": "`/boss` or `c!boss` — dropdown/pick list, phases + cooldowns",
 }
 
 PREFIX_LIST = """**Every slash command has a `c!` twin:**
 `c!profile c!balance c!daily c!stats c!explore c!collection c!team c!dex`
-`c!bosses c!boss c!trainers c!train c!claim_train c!mastery c!bloodline`
+`c!boss c!trainers c!train c!claim_train c!mastery c!bloodline`
 `c!shop c!buy c!sell c!inventory c!use c!coinflip c!dice c!higherlower`
 `c!fight @user c!crew_create c!crew_join c!crew_info c!crew_leave c!crew_war`
 `c!territories c!conquer c!quests c!claim_quest c!events c!generations c!workers`

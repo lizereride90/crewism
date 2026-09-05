@@ -72,7 +72,7 @@ in the Developer Portal → Bot). Examples: `c!profile`, `c!explore`, `c!fight @
 | Shop | `/shop /buy /sell /inventory /use` | same with `c!` |
 | Gamble | `/coinflip /dice /higherlower` | `c!coinflip c!dice c!higherlower` |
 | PvP | `/fight` | `c!fight @user <wager>` |
-| Boss | `/bosses /boss` | `c!bosses c!boss` |
+| Boss | `/boss` (dropdown picker) | `c!boss` (lists options when empty) |
 | Crew | `/crew create/join/info/leave/war` | `c!crew_create c!crew_join c!crew_info c!crew_leave c!crew_war` |
 | Turf | `/territories /conquer` | `c!territories c!conquer` |
 | Quests | `/quests /claim_quest /events /generations /workers` | same with `c!` |
