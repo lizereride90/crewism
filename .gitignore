@@ -11,3 +11,5 @@ node_modules/
 bot.log
 assets/generated/*
 !assets/generated/.gitkeep
+dash.log
+crewism.log
