@@ -1,0 +1,17 @@
+{
+  "name": "crewism",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Crewism — Lookism Discord MMORPG bot + local dashboard. npm start boots both.",
+  "scripts": {
+    "start": "node scripts/start.js",
+    "bot": "python3 main.py",
+    "dash": "node dashboard/server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

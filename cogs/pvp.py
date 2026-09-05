@@ -57,6 +57,10 @@ class Pvp(commands.Cog):
         await self._run_fight(ctx.guild.id, ctx.author, opponent, wager, ctx.send)
 
     async def _run_fight(self, gid, author, opponent, wager, send):
+        from utils.server_config import is_enabled
+        if not await is_enabled(gid, "pvp_enabled"):
+            await send(embed=error_embed("PvP is disabled on this server (dashboard setting)."))
+            return
         wager = clamp_amount(wager, 0, 10000) if wager else 0
         a = await repo.get_or_create_player(gid, author.id, author.display_name)
         b = await repo.get_or_create_player(gid, opponent.id, opponent.display_name)

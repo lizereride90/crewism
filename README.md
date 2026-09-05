@@ -38,20 +38,32 @@ for licensed art later. See [Disclaimer](#disclaimer).
 60-fighter starter roster (Lookism eras + original strays), 7 territories, 7 bosses,
 trainers, quests, items — all data-driven JSON in `data/`.
 
-## Quickstart
+## Quickstart (bot + dashboard together)
 
 ```bash
 pip install -r requirements.txt
+npm install            # dashboard UI deps (express)
 cp .env.example .env   # put DISCORD_TOKEN inside, never commit it
-python main.py
+npm start              # boots bot first, then dashboard → http://localhost:3000
+# or: python main.py   # same thing, single entrypoint
 ```
 
-- DB auto-creates (`crewism.db` via SQLite + SQLAlchemy 2.x + aiosqlite), seeds
-  missing static data, **never wipes player progress**.
+- `python main.py` is the single entrypoint: DB auto-creates (`crewism.db`),
+  seeds 60 fighters + items/trainers/territories/quests/bosses, starts the
+  localhost bot API (`:3100`), then launches the dashboard UI (`:3000`).
+  `npm start` just calls into it. Needs `node` installed for the UI;
+  the bot runs fine without it.
+- Never wipes player data on restart. Switch to Postgres later via `DATABASE_URL`.
 - Slash commands auto-sync on startup. Set `COMMAND_GUILD_ID` in `.env` for instant
   dev sync, or leave empty for global sync.
-- Hourly upkeep (treasury income, event expiry) runs in-process, DB-backed so it
-  survives restarts.
+
+## Dashboard
+
+Local-only Seoul Control room: live overview, per-server feature toggles
+(exploration / PvP / gambling — enforced by the bot instantly, no restart),
+daily-reward tuning, spawn channel, players, economy ledger, bosses,
+territory control, world-event switches. Binds `127.0.0.1` only —
+never expose the port publicly.
 
 ## Requirements
 
@@ -82,8 +94,10 @@ in the Developer Portal → Bot). Examples: `c!profile`, `c!explore`, `c!fight @
 ## Project structure
 
 ```
-main.py            startup: dotenv → logging → init DB → seed → cogs → upkeep → sync → connect
+main.py            startup: dotenv → DB → seed → cogs → upkeep → bot API → dash UI → connect
 config.py          env-based settings, no secrets hardcoded
+dashboard/         Node UI (server.js + public/) — spawned by main.py, proxied to bot API
+scripts/start.js   npm start → python main.py (single entrypoint)
 cogs/              Discord layer only (calls services, no game math)
 database/          models.py + repositories/ (SQL only here)
 services/          game rules (combat, encounters, training, crews, quests…)

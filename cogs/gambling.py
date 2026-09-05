@@ -17,6 +17,9 @@ class Gambling(commands.Cog):
         self.bot = bot
 
     async def _gate(self, interaction, scope: str, cd: int, bet: int):
+        from utils.server_config import is_enabled
+        if not await is_enabled(interaction.guild_id, "gambling_enabled"):
+            return None, "Gambling is disabled on this server (dashboard setting)."
         bet = clamp_amount(bet, 10, 5000)
         p = await repo.get_or_create_player(interaction.guild_id, interaction.user.id, interaction.user.display_name)
         if p.money < bet:
@@ -95,6 +98,18 @@ class Gambling(commands.Cog):
 
     # ---- prefix mirrors ----
 
+    async def _prefix_gate(self, ctx: commands.Context, bet: int):
+        from utils.server_config import is_enabled
+        if not await is_enabled(ctx.guild.id, "gambling_enabled"):
+            await ctx.send("Gambling is disabled on this server (dashboard setting).")
+            return None
+        bet = clamp_amount(bet, 10, 5000)
+        p = await repo.get_or_create_player(ctx.guild.id, ctx.author.id, ctx.author.display_name)
+        if p.money < bet:
+            await ctx.send("Not enough Won.")
+            return None
+        return bet
+
     @commands.command(name="coinflip", aliases=["cf", "flip"])
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def coinflip_prefix(self, ctx: commands.Context, choice: str, bet: int):
@@ -103,10 +118,8 @@ class Gambling(commands.Cog):
             await ctx.send(embed=error_embed("Pick heads or tails. `c!coinflip heads 100`"))
             return
         choice = "heads" if choice.startswith("h") else "tails"
-        bet = clamp_amount(bet, 10, 5000)
-        p = await repo.get_or_create_player(ctx.guild.id, ctx.author.id, ctx.author.display_name)
-        if p.money < bet:
-            await ctx.send("Not enough Won.")
+        bet = await self._prefix_gate(ctx, bet)
+        if bet is None:
             return
         await add_money(ctx.guild.id, ctx.author.id, -bet, "bet_stake", ref="coinflip")
         result = random.choice(["heads", "tails"])
@@ -120,10 +133,8 @@ class Gambling(commands.Cog):
     @commands.command(name="dice", aliases=["roll"])
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def dice_prefix(self, ctx: commands.Context, bet: int):
-        bet = clamp_amount(bet, 10, 5000)
-        p = await repo.get_or_create_player(ctx.guild.id, ctx.author.id, ctx.author.display_name)
-        if p.money < bet:
-            await ctx.send("Not enough Won.")
+        bet = await self._prefix_gate(ctx, bet)
+        if bet is None:
             return
         await add_money(ctx.guild.id, ctx.author.id, -bet, "bet_stake", ref="dice")
         roll = random.randint(1, 6)
@@ -137,10 +148,8 @@ class Gambling(commands.Cog):
     @commands.command(name="higherlower", aliases=["hl"])
     @commands.cooldown(1, 20, commands.BucketType.user)
     async def hl_prefix(self, ctx: commands.Context, bet: int):
-        bet = clamp_amount(bet, 10, 5000)
-        p = await repo.get_or_create_player(ctx.guild.id, ctx.author.id, ctx.author.display_name)
-        if p.money < bet:
-            await ctx.send("Not enough Won.")
+        bet = await self._prefix_gate(ctx, bet)
+        if bet is None:
             return
         await add_money(ctx.guild.id, ctx.author.id, -bet, "bet_stake", ref="hl")
         a, b = random.randint(1, 10), random.randint(1, 10)

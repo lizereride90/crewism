@@ -34,6 +34,10 @@ def _def_combatant(d: CharacterDefinition, scale: float = 1.0) -> dict:
 
 async def explore_flow(gid: int, uid: int, display_name: str, send):
     """Shared explore logic. send(embed, view=None, file=None) delivers the encounter."""
+    from utils.server_config import is_enabled
+    if not await is_enabled(gid, "encounter_enabled"):
+        await send(error_embed("Exploration is disabled on this server (dashboard setting)."))
+        return
     p = await repo.get_or_create_player(gid, uid, display_name)
     p = await repo.apply_energy(p)
     if p.energy < 10:

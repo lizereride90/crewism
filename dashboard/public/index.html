@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Crewism — Seoul Control</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="bg-grid"></div>
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">C</div>
+    <div>
+      <div class="brand-name">CREWISM <span>// SEOUL CONTROL</span></div>
+      <div class="brand-sub"><span id="status-dot" class="dot off"></span><span id="status-text">connecting…</span></div>
+    </div>
+  </div>
+  <div class="top-actions">
+    <select id="guild-select" title="Server"></select>
+    <button id="refresh-btn" class="btn ghost">Refresh</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <button data-tab="overview" class="active">Overview</button>
+    <button data-tab="server">Server Setup</button>
+    <button data-tab="players">Players</button>
+    <button data-tab="economy">Economy</button>
+    <button data-tab="bosses">Bosses</button>
+    <button data-tab="territories">Territories</button>
+    <button data-tab="events">Events</button>
+  </nav>
+
+  <main class="content">
+    <section id="tab-overview" class="tab active">
+      <div id="stat-cards" class="cards"></div>
+      <div class="panel">
+        <h2>Servers</h2>
+        <div id="guild-cards" class="cards"></div>
+      </div>
+      <div class="panel">
+        <h2>Recent activity</h2>
+        <div class="table-wrap"><table id="activity-table">
+          <thead><tr><th>When</th><th>Player</th><th>Change</th><th>Reason</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <section id="tab-server" class="tab">
+      <div class="panel">
+        <h2>Feature toggles <small id="server-name"></small></h2>
+        <p class="hint">These switch the bot's behavior on this server instantly. No restart needed.</p>
+        <label class="switch-row"><span>Exploration <em>/explore, c!explore</em></span><button class="switch" data-key="encounter_enabled"></button></label>
+        <label class="switch-row"><span>PvP <em>/fight, c!fight, crew wars</em></span><button class="switch" data-key="pvp_enabled"></button></label>
+        <label class="switch-row"><span>Gambling <em>coinflip, dice, higher/lower</em></span><button class="switch" data-key="gambling_enabled"></button></label>
+      </div>
+      <div class="panel">
+        <h2>Economy</h2>
+        <label class="field">Daily reward base (Won)
+          <input id="daily-base" type="number" min="0" max="10000" step="50" />
+        </label>
+      </div>
+      <div class="panel">
+        <h2>Channels</h2>
+        <label class="field">Spawn / announcement channel ID <small>(optional, reserved for spawn posts)</small>
+          <input id="spawn-channel" type="text" inputmode="numeric" placeholder="e.g. 1234567890" />
+        </label>
+        <button id="save-server" class="btn primary">Save server settings</button>
+        <span id="save-msg" class="save-msg"></span>
+      </div>
+    </section>
+
+    <section id="tab-players" class="tab">
+      <div class="panel row-between">
+        <h2>Players</h2>
+        <select id="player-sort">
+          <option value="wins">Most wins</option>
+          <option value="money">Richest</option>
+          <option value="bounty">Highest bounty</option>
+          <option value="level">Highest level</option>
+        </select>
+      </div>
+      <div class="panel"><div class="table-wrap"><table id="players-table">
+        <thead><tr><th>#</th><th>Fighter</th><th>LV</th><th>Won</th><th>W</th><th>L</th><th>Bounty</th></tr></thead>
+        <tbody></tbody>
+      </table></div></div>
+    </section>
+
+    <section id="tab-economy" class="tab">
+      <div id="econ-cards" class="cards"></div>
+      <div class="panel">
+        <h2>Ledger — latest money moves</h2>
+        <div class="table-wrap"><table id="ledger-table">
+          <thead><tr><th>When</th><th>Player</th><th>Amount</th><th>Balance</th><th>Reason</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <section id="tab-bosses" class="tab">
+      <div class="panel"><h2>Bosses <small>7-day activity</small></h2>
+      <div id="boss-cards" class="cards"></div></div>
+    </section>
+
+    <section id="tab-territories" class="tab">
+      <div class="panel"><h2>Territory control <small id="terr-guild"></small></h2>
+      <div id="terr-list"></div></div>
+    </section>
+
+    <section id="tab-events" class="tab">
+      <div class="panel"><h2>World events</h2>
+        <p class="hint">Active events modify encounter rates, rewards and boss availability.</p>
+        <div id="event-list"></div></div>
+    </section>
+  </main>
+</div>
+
+<footer>Crewism dashboard · local only — never expose this port publicly · fan project, placeholder art</footer>
+<script src="app.js"></script>
+</body>
+</html>

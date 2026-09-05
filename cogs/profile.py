@@ -58,6 +58,12 @@ class Profile(commands.Cog):
             await interaction.followup.send(f"Already claimed. Come back in ~{left}h.")
             return
         reward = daily_reward(1)
+        try:
+            from utils.server_config import daily_base_for
+            base = await daily_base_for(interaction.guild_id)
+            reward = base + min(500, 25)
+        except Exception:
+            pass
         # update timestamp first (idempotent-ish), then ledger money
         async with SessionLocal() as s:
             r = await s.execute(select(Player).where(
@@ -115,6 +121,12 @@ class Profile(commands.Cog):
             await ctx.send(f"Already claimed. Come back in ~{left}h.")
             return
         reward = daily_reward(1)
+        try:
+            from utils.server_config import daily_base_for
+            base = await daily_base_for(ctx.guild.id)
+            reward = base + min(500, 25)
+        except Exception:
+            pass
         async with SessionLocal() as s:
             r = await s.execute(select(Player).where(
                 Player.guild_id == ctx.guild.id, Player.user_id == ctx.author.id))
