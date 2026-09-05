@@ -67,7 +67,11 @@ async def on_ready():
     log.info("logged in as %s in %d guilds", bot.user, len(bot.guilds))
     try:
         if settings.command_guild_id:
-            await bot.tree.sync(guild=discord.Object(id=settings.command_guild_id))
+            guild = discord.Object(id=settings.command_guild_id)
+            await bot.tree.sync(guild=guild)
+            # delete stale global duplicates so commands don't show twice
+            bot.tree.clear_commands(guild=None)
+            await bot.tree.sync()
         else:
             await bot.tree.sync()
         log.info("slash commands synced")
