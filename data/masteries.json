@@ -1,0 +1,74 @@
+[
+  {
+    "id": "strength",
+    "name": "Strength Mastery",
+    "stages": [
+      "Normal",
+      "Approaching Threshold",
+      "Threshold",
+      "Advanced"
+    ],
+    "req": {
+      "stat": "str",
+      "thresholds": [
+        30,
+        60,
+        100
+      ]
+    }
+  },
+  {
+    "id": "speed",
+    "name": "Speed Mastery",
+    "stages": [
+      "Normal",
+      "Approaching Threshold",
+      "Threshold",
+      "Advanced"
+    ],
+    "req": {
+      "stat": "spd",
+      "thresholds": [
+        30,
+        60,
+        100
+      ]
+    }
+  },
+  {
+    "id": "endurance",
+    "name": "Endurance Mastery",
+    "stages": [
+      "Normal",
+      "Approaching Threshold",
+      "Threshold",
+      "Advanced"
+    ],
+    "req": {
+      "stat": "end",
+      "thresholds": [
+        30,
+        60,
+        100
+      ]
+    }
+  },
+  {
+    "id": "technique",
+    "name": "Technique Mastery",
+    "stages": [
+      "Normal",
+      "Approaching Threshold",
+      "Threshold",
+      "Advanced"
+    ],
+    "req": {
+      "stat": "tech",
+      "thresholds": [
+        30,
+        60,
+        100
+      ]
+    }
+  }
+]

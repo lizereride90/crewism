@@ -1,0 +1,38 @@
+[
+  {
+    "id": "big_deal",
+    "name": "Big Deal",
+    "tag": "BD",
+    "source": "canon"
+  },
+  {
+    "id": "hostel",
+    "name": "Hostel",
+    "tag": "HST",
+    "source": "canon"
+  },
+  {
+    "id": "goddog",
+    "name": "God Dog",
+    "tag": "GD",
+    "source": "canon"
+  },
+  {
+    "id": "workers",
+    "name": "Workers",
+    "tag": "WRK",
+    "source": "canon"
+  },
+  {
+    "id": "allied",
+    "name": "Allied",
+    "tag": "ALY",
+    "source": "canon"
+  },
+  {
+    "id": "hnh",
+    "name": "HNH Group",
+    "tag": "HNH",
+    "source": "canon"
+  }
+]

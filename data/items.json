@@ -1,0 +1,100 @@
+[
+  {
+    "id": "milk",
+    "name": "Choco Milk",
+    "kind": "consumable",
+    "rarity": "Common",
+    "price": 50,
+    "description": "Recovers 20 energy.",
+    "effects": {
+      "energy": 20
+    },
+    "source": "original"
+  },
+  {
+    "id": "heat_pack",
+    "name": "Heat Pack",
+    "kind": "consumable",
+    "rarity": "Common",
+    "price": 80,
+    "description": "Recovers 30 HP in fight prep.",
+    "effects": {
+      "heal": 30
+    },
+    "source": "original"
+  },
+  {
+    "id": "knuckles",
+    "name": "Brass Knuckles",
+    "kind": "weapon",
+    "rarity": "Uncommon",
+    "price": 400,
+    "description": "+4 STR when equipped.",
+    "effects": {
+      "str": 4
+    },
+    "source": "original"
+  },
+  {
+    "id": "chair_steel",
+    "name": "Steel Chair",
+    "kind": "weapon",
+    "rarity": "Rare",
+    "price": 900,
+    "description": "+8 STR, -2 SPD.",
+    "effects": {
+      "str": 8,
+      "spd": -2
+    },
+    "source": "original"
+  },
+  {
+    "id": "hnh_jacket",
+    "name": "HNH Jacket",
+    "kind": "armor",
+    "rarity": "Rare",
+    "price": 800,
+    "description": "+5 END.",
+    "effects": {
+      "end": 5
+    },
+    "source": "original"
+  },
+  {
+    "id": "wraps",
+    "name": "Hand Wraps",
+    "kind": "accessory",
+    "rarity": "Common",
+    "price": 150,
+    "description": "+2 STR +2 SPD.",
+    "effects": {
+      "str": 2,
+      "spd": 2
+    },
+    "source": "original"
+  },
+  {
+    "id": "exp_drink",
+    "name": "Protein Shake",
+    "kind": "training",
+    "rarity": "Uncommon",
+    "price": 300,
+    "description": "+25% training gains (one session).",
+    "effects": {
+      "train_boost": 25
+    },
+    "source": "original"
+  },
+  {
+    "id": "frag_pack",
+    "name": "Fragment Pack",
+    "kind": "special",
+    "rarity": "Epic",
+    "price": 2000,
+    "description": "Convert to a random recruitable fragment boost.",
+    "effects": {
+      "fragments": 5
+    },
+    "source": "original"
+  }
+]

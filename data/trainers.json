@@ -1,0 +1,68 @@
+[
+  {
+    "id": "tom_lee",
+    "name": "Tom Lee",
+    "specialty": "endurance",
+    "price": 800,
+    "duration_min": 60,
+    "req_level": 5,
+    "region": "jhigh",
+    "rarity": "Legendary",
+    "source": "canon"
+  },
+  {
+    "id": "gongseop",
+    "name": "Gongseop Ji",
+    "specialty": "technique",
+    "price": 600,
+    "duration_min": 60,
+    "req_level": 3,
+    "region": "jhigh",
+    "rarity": "Epic",
+    "source": "canon"
+  },
+  {
+    "id": "boxing_coach",
+    "name": "Boxing Coach (Original)",
+    "specialty": "strength",
+    "price": 200,
+    "duration_min": 30,
+    "req_level": 1,
+    "region": "jhigh",
+    "rarity": "Common",
+    "source": "original"
+  },
+  {
+    "id": "mma_gym",
+    "name": "MMA Gym (Original)",
+    "specialty": "speed",
+    "price": 300,
+    "duration_min": 45,
+    "req_level": 2,
+    "region": "bigdeal_turf",
+    "rarity": "Uncommon",
+    "source": "original"
+  },
+  {
+    "id": "sword_master",
+    "name": "Blade Mentor (Original)",
+    "specialty": "technique",
+    "price": 700,
+    "duration_min": 90,
+    "req_level": 8,
+    "region": "cheonliang",
+    "rarity": "Rare",
+    "source": "original"
+  },
+  {
+    "id": "workers_drill",
+    "name": "Workers Drill (Original)",
+    "specialty": "strength",
+    "price": 1500,
+    "duration_min": 120,
+    "req_level": 15,
+    "region": "workers_turf",
+    "rarity": "Epic",
+    "source": "original"
+  }
+]

@@ -1,0 +1,204 @@
+[
+  {
+    "id": "jhigh_bully_king",
+    "name": "J High Bully King",
+    "level": 5,
+    "stats": {
+      "str": 22,
+      "spd": 18,
+      "end": 22,
+      "tech": 16,
+      "iq": 12
+    },
+    "abilities": [
+      "boxing_pressure"
+    ],
+    "phases": [
+      {
+        "at": 50,
+        "note": "Enraged: +20% damage"
+      }
+    ],
+    "rewards": {
+      "money": 500,
+      "xp": 300
+    },
+    "region": "jhigh",
+    "cooldown_h": 6,
+    "generation": 2
+  },
+  {
+    "id": "hudson_boss",
+    "name": "Big Deal Enforcer",
+    "level": 10,
+    "stats": {
+      "str": 28,
+      "spd": 18,
+      "end": 28,
+      "tech": 18,
+      "iq": 14
+    },
+    "abilities": [
+      "grapple"
+    ],
+    "phases": [
+      {
+        "at": 50,
+        "note": "Calls backup: +defense"
+      }
+    ],
+    "rewards": {
+      "money": 900,
+      "xp": 600
+    },
+    "region": "bigdeal_turf",
+    "cooldown_h": 12,
+    "generation": 2
+  },
+  {
+    "id": "hostel_boss",
+    "name": "Hostel Captain",
+    "level": 12,
+    "stats": {
+      "str": 26,
+      "spd": 26,
+      "end": 24,
+      "tech": 24,
+      "iq": 16
+    },
+    "abilities": [
+      "kick_range"
+    ],
+    "phases": [],
+    "rewards": {
+      "money": 1100,
+      "xp": 700
+    },
+    "region": "hostel_turf",
+    "cooldown_h": 12,
+    "generation": 2
+  },
+  {
+    "id": "seongji_boss",
+    "name": "Blade of Cheonliang",
+    "level": 18,
+    "stats": {
+      "str": 32,
+      "spd": 30,
+      "end": 28,
+      "tech": 32,
+      "iq": 20
+    },
+    "abilities": [
+      "weapon_master"
+    ],
+    "phases": [
+      {
+        "at": 60,
+        "note": "Draws blade: +dmg"
+      },
+      {
+        "at": 30,
+        "note": "Enraged"
+      }
+    ],
+    "rewards": {
+      "money": 2000,
+      "xp": 1400
+    },
+    "region": "cheonliang",
+    "cooldown_h": 24,
+    "generation": 1
+  },
+  {
+    "id": "worker_exec_boss",
+    "name": "Workers Executive",
+    "level": 24,
+    "stats": {
+      "str": 34,
+      "spd": 32,
+      "end": 34,
+      "tech": 32,
+      "iq": 26
+    },
+    "abilities": [
+      "systema_flow",
+      "iron_will"
+    ],
+    "phases": [
+      {
+        "at": 50,
+        "note": "Executive aura"
+      }
+    ],
+    "rewards": {
+      "money": 3500,
+      "xp": 2200
+    },
+    "region": "gangnam",
+    "cooldown_h": 24,
+    "generation": 1
+  },
+  {
+    "id": "gun_boss",
+    "name": "Gun (Workers)",
+    "level": 40,
+    "stats": {
+      "str": 44,
+      "spd": 40,
+      "end": 42,
+      "tech": 40,
+      "iq": 36
+    },
+    "abilities": [
+      "ultra_instinct",
+      "invisible_attack"
+    ],
+    "phases": [
+      {
+        "at": 66,
+        "note": "Serious: +15% all"
+      },
+      {
+        "at": 33,
+        "note": "Unconscious flow"
+      }
+    ],
+    "rewards": {
+      "money": 8000,
+      "xp": 5000
+    },
+    "region": "workers_turf",
+    "cooldown_h": 48,
+    "generation": 1
+  },
+  {
+    "id": "james_boss",
+    "name": "James Lee (?)",
+    "level": 50,
+    "stats": {
+      "str": 46,
+      "spd": 46,
+      "end": 42,
+      "tech": 44,
+      "iq": 40
+    },
+    "abilities": [
+      "invisible_attack",
+      "mastermind"
+    ],
+    "phases": [
+      {
+        "at": 50,
+        "note": "Unseen strikes"
+      }
+    ],
+    "rewards": {
+      "money": 12000,
+      "xp": 8000
+    },
+    "region": "hnh_tower",
+    "cooldown_h": 72,
+    "generation": 1
+  }
+]

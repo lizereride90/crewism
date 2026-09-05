@@ -1,0 +1,17 @@
+[
+  {
+    "id": 0,
+    "name": "Generation 0",
+    "notes": "Legends era. High difficulty pools."
+  },
+  {
+    "id": 1,
+    "name": "Generation 1",
+    "notes": "Workers rise era."
+  },
+  {
+    "id": 2,
+    "name": "Generation 2",
+    "notes": "Current J High era. Starter pools."
+  }
+]

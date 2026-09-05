@@ -1,0 +1,67 @@
+[
+  {
+    "id": "daily_patrol",
+    "name": "Daily Patrol",
+    "kind": "daily",
+    "description": "Explore 3 times.",
+    "req": {
+      "explore": 3
+    },
+    "rewards": {
+      "money": 300,
+      "xp": 100
+    }
+  },
+  {
+    "id": "daily_spar",
+    "name": "Daily Spar",
+    "kind": "daily",
+    "description": "Win 2 fights.",
+    "req": {
+      "wins": 2
+    },
+    "rewards": {
+      "money": 400,
+      "xp": 150
+    }
+  },
+  {
+    "id": "weekly_war",
+    "name": "Weekly Warrior",
+    "kind": "weekly",
+    "description": "Win 10 fights this week.",
+    "req": {
+      "wins": 10
+    },
+    "rewards": {
+      "money": 2000,
+      "xp": 800
+    }
+  },
+  {
+    "id": "gen2_rising",
+    "name": "Gen2 Rising",
+    "kind": "generation",
+    "description": "Reach player level 10.",
+    "req": {
+      "level": 10
+    },
+    "rewards": {
+      "money": 1000,
+      "xp": 500
+    }
+  },
+  {
+    "id": "crew_first",
+    "name": "Find Your Crew",
+    "kind": "crew",
+    "description": "Join or create a crew.",
+    "req": {
+      "crew": 1
+    },
+    "rewards": {
+      "money": 800,
+      "xp": 300
+    }
+  }
+]

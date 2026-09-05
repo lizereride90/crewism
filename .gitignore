@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+.pytest_cache/
+bot.log
+assets/generated/*
+!assets/generated/.gitkeep

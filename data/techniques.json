@@ -1,0 +1,158 @@
+[
+  {
+    "id": "copy",
+    "name": "Copy",
+    "kind": "active",
+    "trigger": "on_learn",
+    "description": "Chance to mimic a compatible enemy technique for the rest of the fight.",
+    "effects": {
+      "copy_chance": 25
+    },
+    "source": "canon"
+  },
+  {
+    "id": "ultra_instinct",
+    "name": "Ultra Instinct (Unconscious)",
+    "kind": "active",
+    "trigger": "on_low_hp",
+    "description": "Improved reactions when stamina runs low.",
+    "effects": {
+      "dodge": 15,
+      "counter": 10
+    },
+    "source": "canon"
+  },
+  {
+    "id": "invisible_attack",
+    "name": "Invisible Attack",
+    "kind": "active",
+    "trigger": "on_round",
+    "description": "Hard-to-see strike, bonus damage if faster.",
+    "effects": {
+      "bonus_dmg": 20,
+      "req_spd_adv": 5
+    },
+    "source": "canon"
+  },
+  {
+    "id": "conviction",
+    "name": "Conviction",
+    "kind": "passive",
+    "trigger": "on_low_hp",
+    "description": "Comeback power when losing.",
+    "effects": {
+      "comeback": 20
+    },
+    "source": "canon"
+  },
+  {
+    "id": "boxing_pressure",
+    "name": "Boxer Pressure",
+    "kind": "passive",
+    "trigger": "on_round",
+    "description": "Boxing combo pressure.",
+    "effects": {
+      "combo": 10
+    },
+    "source": "original"
+  },
+  {
+    "id": "iron_will",
+    "name": "Iron Will",
+    "kind": "passive",
+    "trigger": "on_hit",
+    "description": "Damage reduction.",
+    "effects": {
+      "dr": 10
+    },
+    "source": "original"
+  },
+  {
+    "id": "judo_throw",
+    "name": "Judo Throw",
+    "kind": "active",
+    "trigger": "on_round",
+    "description": "Throw on technique advantage.",
+    "effects": {
+      "throw": 15
+    },
+    "source": "original"
+  },
+  {
+    "id": "weapon_master",
+    "name": "Weapon Handling",
+    "kind": "passive",
+    "trigger": "on_equip_weapon",
+    "description": "Bonus with weapons equipped.",
+    "effects": {
+      "weapon_bonus": 20
+    },
+    "source": "original"
+  },
+  {
+    "id": "grapple",
+    "name": "Grapple",
+    "kind": "active",
+    "trigger": "on_round",
+    "description": "Control win chance.",
+    "effects": {
+      "control": 12
+    },
+    "source": "original"
+  },
+  {
+    "id": "cheer",
+    "name": "Cheer",
+    "kind": "team",
+    "trigger": "on_team",
+    "description": "Small team morale boost.",
+    "effects": {
+      "team_all": 3
+    },
+    "source": "original"
+  },
+  {
+    "id": "systema_flow",
+    "name": "Systema Flow",
+    "kind": "passive",
+    "trigger": "on_dodge",
+    "description": "Redirect on dodge.",
+    "effects": {
+      "redirect": 12
+    },
+    "source": "original"
+  },
+  {
+    "id": "counter_master",
+    "name": "Counter Master",
+    "kind": "passive",
+    "trigger": "on_enemy_attack",
+    "description": "Counter chance up.",
+    "effects": {
+      "counter": 15
+    },
+    "source": "original"
+  },
+  {
+    "id": "quick_learn",
+    "name": "Quick Learner",
+    "kind": "passive",
+    "trigger": "on_xp",
+    "description": "Bonus XP.",
+    "effects": {
+      "xp": 10
+    },
+    "source": "original"
+  },
+  {
+    "id": "mastermind",
+    "name": "Mastermind",
+    "kind": "team",
+    "trigger": "on_team",
+    "description": "Crew-wide planning bonus.",
+    "effects": {
+      "team_all": 5
+    },
+    "source": "original"
+  }
+]

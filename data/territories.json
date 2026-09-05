@@ -1,0 +1,58 @@
+[
+  {
+    "id": "jhigh",
+    "name": "J High Area",
+    "rec_level": 1,
+    "income": 150,
+    "boss_id": "jhigh_bully_king",
+    "description": "School streets. Starter zone."
+  },
+  {
+    "id": "bigdeal_turf",
+    "name": "Big Deal Territory",
+    "rec_level": 5,
+    "income": 300,
+    "boss_id": "hudson_boss",
+    "description": "Big Deal controlled blocks."
+  },
+  {
+    "id": "hostel_turf",
+    "name": "Hostel Territory",
+    "rec_level": 5,
+    "income": 300,
+    "boss_id": "hostel_boss",
+    "description": "Hostel lodging streets."
+  },
+  {
+    "id": "cheonliang",
+    "name": "Cheonliang",
+    "rec_level": 12,
+    "income": 600,
+    "boss_id": "seongji_boss",
+    "description": "Blades and danger."
+  },
+  {
+    "id": "gangnam",
+    "name": "Gangnam",
+    "rec_level": 15,
+    "income": 800,
+    "boss_id": "worker_exec_boss",
+    "description": "Workers money streets."
+  },
+  {
+    "id": "workers_turf",
+    "name": "Workers Territory",
+    "rec_level": 20,
+    "income": 1200,
+    "boss_id": "gun_boss",
+    "description": "Endgame. Bring a crew."
+  },
+  {
+    "id": "hnh_tower",
+    "name": "HNH Building",
+    "rec_level": 25,
+    "income": 1500,
+    "boss_id": "james_boss",
+    "description": "Top of the world."
+  }
+]

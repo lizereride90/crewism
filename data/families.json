@@ -1,0 +1,32 @@
+[
+  {
+    "id": "yamazaki",
+    "name": "Yamazaki Family",
+    "source": "canon",
+    "notes": "Durability lineage. Exact limits unrevealed; game uses configurable buffs."
+  },
+  {
+    "id": "gapryong",
+    "name": "Gapryong Kim Line",
+    "source": "canon",
+    "notes": "Fist legend. Configurable."
+  },
+  {
+    "id": "mujin",
+    "name": "Mujin Jin Line",
+    "source": "canon",
+    "notes": "Northern lineage. Configurable."
+  },
+  {
+    "id": "copy_line",
+    "name": "Copy Lineage",
+    "source": "configurable",
+    "notes": "Park/Seong mimicry. Rules not fully revealed; game interpretation."
+  },
+  {
+    "id": "stray",
+    "name": "Stray (Original)",
+    "source": "original",
+    "notes": "For random-clan players."
+  }
+]
