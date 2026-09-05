@@ -21,16 +21,33 @@ class Combat(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="bosses", description="List bosses")
+    async def _boss_choices(self, current: str) -> list:
+        async with SessionLocal() as s:
+            r = await s.execute(select(Boss))
+            rows = r.scalars().all()
+        out = []
+        for b in rows:
+            label = f"{b.name} (LV{b.level} • {b.region})"
+            if not current or current.lower() in b.name.lower() or current.lower() in b.id.lower():
+                out.append((label, b.id))
+        return out[:25]
+
+    async def boss_autocomplete(self, interaction: discord.Interaction, current: str):
+        return [app_commands.Choice(name=label, value=bid)
+                for label, bid in await self._boss_choices(current)]
+
+    @app_commands.command(name="bosses", description="List all bosses")
     async def bosses(self, interaction: discord.Interaction):
         async with SessionLocal() as s:
             r = await s.execute(select(Boss))
             rows = r.scalars().all()
         txt = "\n".join(f"{b.name} LV{b.level} ({b.region})" for b in rows)
+        txt += "\n\nFight one with `/boss` — pick from the dropdown."
         await interaction.response.send_message(embed=embed("Bosses", txt), ephemeral=True)
 
-    @app_commands.command(name="boss", description="Fight a boss (phases, cooldowns)")
-    @app_commands.describe(boss_id="Boss id, see /bosses names")
+    @app_commands.command(name="boss", description="Fight a boss — pick from the list")
+    @app_commands.describe(boss_id="Choose your boss")
+    @app_commands.autocomplete(boss_id=boss_autocomplete)
     async def boss(self, interaction: discord.Interaction, boss_id: str):
         await interaction.response.defer()
         gid, uid = interaction.guild_id, interaction.user.id
@@ -104,9 +121,16 @@ class Combat(commands.Cog):
         txt = "\n".join(f"{b.name} LV{b.level} ({b.region})" for b in rows)
         await ctx.send(embed=embed("Bosses", txt))
 
-    @commands.command(name="boss")
+    @commands.command(name="boss", aliases=["raid"])
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def boss_prefix(self, ctx: commands.Context, *, boss_id: str):
+    async def boss_prefix(self, ctx: commands.Context, *, boss_id: str = ""):
+        if not boss_id.strip():
+            async with SessionLocal() as s:
+                r = await s.execute(select(Boss))
+                rows = r.scalars().all()
+            txt = "\n".join(f"`{b.id}` — {b.name} LV{b.level} ({b.region})" for b in rows)
+            await ctx.send(embed=embed("Pick a boss — `c!boss <id>`", txt))
+            return
         gid, uid = ctx.guild.id, ctx.author.id
         p = await repo.get_or_create_player(gid, uid, ctx.author.display_name)
         async with SessionLocal() as s:
