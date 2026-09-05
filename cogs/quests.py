@@ -118,5 +118,95 @@ class Quests(commands.Cog):
                        "Beat them for big Won. Details configurable as canon is revealed."), ephemeral=True)
 
 
+    # ---- prefix mirrors ----
+
+    @commands.command(name="quests", aliases=["q"])
+    async def quests_prefix(self, ctx: commands.Context):
+        gid, uid = ctx.guild.id, ctx.author.id
+        async with SessionLocal() as s:
+            qs = (await s.execute(select(Quest))).scalars().all()
+            lines = []
+            for q in qs:
+                key = _today() if q.kind == "daily" else (_week() if q.kind == "weekly" else "perm")
+                pr = (await s.execute(select(QuestProgress).where(
+                    QuestProgress.guild_id == gid, QuestProgress.user_id == uid,
+                    QuestProgress.quest_id == q.id, QuestProgress.date_key == key))).scalar_one_or_none()
+                mark = "✅" if pr and pr.completed else "•"
+                lines.append(f"{mark} {q.name} [{q.kind}] — {q.description}")
+        await ctx.send(embed=embed("Quests", "\n".join(lines) or "None"))
+
+    @commands.command(name="claim_quest", aliases=["claimquest"])
+    async def claim_quest_prefix(self, ctx: commands.Context, *, quest_id: str):
+        gid, uid = ctx.guild.id, ctx.author.id
+        p = await repo.get_or_create_player(gid, uid, ctx.author.display_name)
+        async with SessionLocal() as s:
+            q = await s.get(Quest, quest_id)
+            if not q:
+                r = await s.execute(select(Quest).where(Quest.name.ilike(f"%{quest_id}%")))
+                q = r.scalars().first()
+            if not q:
+                await ctx.send("Unknown quest.")
+                return
+            key = _today() if q.kind == "daily" else (_week() if q.kind == "weekly" else "perm")
+            pr = (await s.execute(select(QuestProgress).where(
+                QuestProgress.guild_id == gid, QuestProgress.user_id == uid,
+                QuestProgress.quest_id == q.id, QuestProgress.date_key == key))).scalar_one_or_none()
+            req = dict(q.req or {})
+            ok = True
+            if "level" in req and p.level < req["level"]:
+                ok = False
+            if "wins" in req and p.wins < req["wins"]:
+                ok = False
+            if "explore" in req and p.level < 2 and p.wins < 1:
+                ok = False
+            if "crew" in req and not p.crew_id:
+                ok = False
+            if not ok:
+                await ctx.send("Requirements not met yet.")
+                return
+            if pr and pr.claimed:
+                await ctx.send("Already claimed.")
+                return
+            if pr:
+                pr.completed = 1
+                pr.claimed = 1
+            else:
+                s.add(QuestProgress(guild_id=gid, user_id=uid, quest_id=q.id,
+                                    progress=1, completed=1, claimed=1, date_key=key))
+            await s.commit()
+            rw = dict(q.rewards or {})
+        if rw.get("money"):
+            await add_money(gid, uid, int(rw["money"]), "quest", ref=q.id)
+        if rw.get("xp"):
+            async with SessionLocal() as s:
+                r = await s.execute(select(Player).where(Player.guild_id == gid, Player.user_id == uid))
+                r.scalar_one().xp += int(rw["xp"])
+                await s.commit()
+        await ctx.send(f"Claimed {q.name}: +{rw.get('money', 0)} Won +{rw.get('xp', 0)} XP.")
+
+    @commands.command(name="events")
+    async def events_prefix(self, ctx: commands.Context):
+        async with SessionLocal() as s:
+            rows = (await s.execute(select(Event).where(Event.active == 1))).scalars().all()
+        if not rows:
+            await ctx.send("No active events. Gang war season starts soon.")
+            return
+        await ctx.send(embed=embed("Events", "\n".join(f"{e.name}" for e in rows)))
+
+    @commands.command(name="generations", aliases=["gen"])
+    async def generations_prefix(self, ctx: commands.Context):
+        p = await repo.get_or_create_player(ctx.guild.id, ctx.author.id, ctx.author.display_name)
+        txt = (f"You are Gen {p.generation}.\nGen 2: J High streets (start).\n"
+               f"Gen 1: Workers/Cheonliang at LV12+.\nGen 0: Legends at LV25+.\n"
+               f"Bosses/territories gate the climb.")
+        await ctx.send(embed=embed("Generations", txt))
+
+    @commands.command(name="workers")
+    async def workers_prefix(self, ctx: commands.Context):
+        await ctx.send(embed=embed(
+            "Workers", "Affiliates run Gangnam. Executives appear as bosses. "
+                       "Beat them for big Won. Details configurable as canon is revealed."))
+
+
 async def setup(bot):
     await bot.add_cog(Quests(bot))

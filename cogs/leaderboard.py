@@ -43,5 +43,34 @@ class Leaderboard(commands.Cog):
         await interaction.response.send_message(f"{p.name}: {p.bounty:,} bounty (W{p.wins}/L{p.losses}).", ephemeral=True)
 
 
+    # ---- prefix mirrors ----
+
+    @commands.command(name="leaderboard", aliases=["lb", "top"])
+    async def leaderboard_prefix(self, ctx: commands.Context, board: str = "wins"):
+        board = board.lower()
+        if board not in ("wins", "money", "bounty", "level"):
+            board = "wins"
+        col = {"wins": Player.wins, "money": Player.money, "bounty": Player.bounty, "level": Player.level}[board]
+        async with SessionLocal() as s:
+            rows = (await s.execute(select(Player).where(Player.guild_id == ctx.guild.id)
+                                    .order_by(desc(col)).limit(10))).scalars().all()
+        if not rows:
+            await ctx.send("Nobody ranked yet.")
+            return
+        lines = [f"{i+1}. {r.name} — {getattr(r, board):,}" for i, r in enumerate(rows)]
+        await ctx.send(embed=discord.Embed(title=f"Leaderboard: {board}", description="\n".join(lines), color=0xFFD700))
+
+    @commands.command(name="bounty")
+    async def bounty_prefix(self, ctx: commands.Context, member: discord.Member | None = None):
+        m = member or ctx.author
+        async with SessionLocal() as s:
+            r = await s.execute(select(Player).where(Player.guild_id == ctx.guild.id, Player.user_id == m.id))
+            p = r.scalar_one_or_none()
+        if not p:
+            await ctx.send("No record.")
+            return
+        await ctx.send(f"{p.name}: {p.bounty:,} bounty (W{p.wins}/L{p.losses}).")
+
+
 async def setup(bot):
     await bot.add_cog(Leaderboard(bot))

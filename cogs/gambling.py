@@ -93,5 +93,64 @@ class Gambling(commands.Cog):
         await interaction.followup.send(msg)
 
 
+    # ---- prefix mirrors ----
+
+    @commands.command(name="coinflip", aliases=["cf", "flip"])
+    @commands.cooldown(1, 15, commands.BucketType.user)
+    async def coinflip_prefix(self, ctx: commands.Context, choice: str, bet: int):
+        choice = choice.lower()
+        if choice not in ("heads", "tails", "h", "t"):
+            await ctx.send(embed=error_embed("Pick heads or tails. `c!coinflip heads 100`"))
+            return
+        choice = "heads" if choice.startswith("h") else "tails"
+        bet = clamp_amount(bet, 10, 5000)
+        p = await repo.get_or_create_player(ctx.guild.id, ctx.author.id, ctx.author.display_name)
+        if p.money < bet:
+            await ctx.send("Not enough Won.")
+            return
+        await add_money(ctx.guild.id, ctx.author.id, -bet, "bet_stake", ref="coinflip")
+        result = random.choice(["heads", "tails"])
+        if result == choice:
+            payout = int(bet * 1.9)
+            await add_money(ctx.guild.id, ctx.author.id, payout, "bet_win", ref="coinflip")
+            await ctx.send(f"{result.upper()}! Won +{fmt_money(payout - bet)} (net).")
+        else:
+            await ctx.send(f"{result.upper()}! Lost -{fmt_money(bet)}.")
+
+    @commands.command(name="dice", aliases=["roll"])
+    @commands.cooldown(1, 15, commands.BucketType.user)
+    async def dice_prefix(self, ctx: commands.Context, bet: int):
+        bet = clamp_amount(bet, 10, 5000)
+        p = await repo.get_or_create_player(ctx.guild.id, ctx.author.id, ctx.author.display_name)
+        if p.money < bet:
+            await ctx.send("Not enough Won.")
+            return
+        await add_money(ctx.guild.id, ctx.author.id, -bet, "bet_stake", ref="dice")
+        roll = random.randint(1, 6)
+        if roll >= 4:
+            payout = int(bet * 1.8)
+            await add_money(ctx.guild.id, ctx.author.id, payout, "bet_win", ref="dice")
+            await ctx.send(f"Rolled {roll}! Won +{fmt_money(payout - bet)}.")
+        else:
+            await ctx.send(f"Rolled {roll}. Lost -{fmt_money(bet)}.")
+
+    @commands.command(name="higherlower", aliases=["hl"])
+    @commands.cooldown(1, 20, commands.BucketType.user)
+    async def hl_prefix(self, ctx: commands.Context, bet: int):
+        bet = clamp_amount(bet, 10, 5000)
+        p = await repo.get_or_create_player(ctx.guild.id, ctx.author.id, ctx.author.display_name)
+        if p.money < bet:
+            await ctx.send("Not enough Won.")
+            return
+        await add_money(ctx.guild.id, ctx.author.id, -bet, "bet_stake", ref="hl")
+        a, b = random.randint(1, 10), random.randint(1, 10)
+        if b > a:
+            payout = int(bet * 1.9)
+            await add_money(ctx.guild.id, ctx.author.id, payout, "bet_win", ref="hl")
+            await ctx.send(f"{a} → {b} HIGHER! +{fmt_money(payout - bet)}.")
+        else:
+            await ctx.send(f"{a} → {b}. Lost -{fmt_money(bet)}.")
+
+
 async def setup(bot):
     await bot.add_cog(Gambling(bot))

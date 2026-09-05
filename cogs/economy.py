@@ -101,5 +101,82 @@ class Economy(commands.Cog):
             await interaction.followup.send("That isn't usable with /use. Weapons equip via `/equip`.")
 
 
+    # ---- prefix mirrors ----
+
+    @commands.command(name="shop", aliases=["store"])
+    async def shop_prefix(self, ctx: commands.Context):
+        async with SessionLocal() as s:
+            r = await s.execute(select(ItemDefinition))
+            items = r.scalars().all()
+        txt = "\n".join(f"`{i.id}` {i.name} [{i.rarity}] — {fmt_money(i.price)}" for i in items)
+        await ctx.send(embed=embed("Shop", txt))
+
+    @commands.command(name="buy")
+    async def buy_prefix(self, ctx: commands.Context, item_id: str, qty: int = 1):
+        qty = clamp_amount(qty, 1, 99)
+        async with SessionLocal() as s:
+            d = await s.get(ItemDefinition, item_id)
+            if not d:
+                await ctx.send(embed=error_embed("Unknown item."))
+                return
+            cost = d.price * qty
+        try:
+            await add_money(ctx.guild.id, ctx.author.id, -cost, "shop_buy", ref=item_id)
+        except ValueError:
+            await ctx.send(embed=error_embed("Not enough Won."))
+            return
+        await add_item(ctx.guild.id, ctx.author.id, item_id, qty)
+        await ctx.send(f"Bought {d.name} x{qty} for {fmt_money(cost)}.")
+
+    @commands.command(name="sell")
+    async def sell_prefix(self, ctx: commands.Context, item_id: str, qty: int = 1):
+        qty = clamp_amount(qty, 1, 99)
+        async with SessionLocal() as s:
+            d = await s.get(ItemDefinition, item_id)
+            if not d:
+                await ctx.send(embed=error_embed("Unknown item."))
+                return
+        try:
+            await remove_item(ctx.guild.id, ctx.author.id, item_id, qty)
+        except ValueError:
+            await ctx.send(embed=error_embed("You don't have that many."))
+            return
+        gain = int(d.price * 0.7) * qty
+        await add_money(ctx.guild.id, ctx.author.id, gain, "shop_sell", ref=item_id)
+        await ctx.send(f"Sold {d.name} x{qty} for +{fmt_money(gain)}.")
+
+    @commands.command(name="inventory", aliases=["inv", "bag"])
+    async def inventory_prefix(self, ctx: commands.Context):
+        rows = await list_inventory(ctx.guild.id, ctx.author.id)
+        if not rows:
+            await ctx.send("Empty.")
+            return
+        async with SessionLocal() as s:
+            lines = []
+            for r in rows:
+                d = await s.get(ItemDefinition, r.item_id)
+                lines.append(f"{d.name} x{r.qty}" + (f" (on #{r.equipped_to})" if r.equipped_to else ""))
+        await ctx.send(embed=embed("Inventory", "\n".join(lines)))
+
+    @commands.command(name="use")
+    async def use_prefix(self, ctx: commands.Context, item_id: str):
+        try:
+            await remove_item(ctx.guild.id, ctx.author.id, item_id, 1)
+        except ValueError:
+            await ctx.send(embed=error_embed("None left."))
+            return
+        async with SessionLocal() as s:
+            d = await s.get(ItemDefinition, item_id)
+            fx = dict(d.effects or {})
+        if "energy" in fx:
+            p = await repo.get_or_create_player(ctx.guild.id, ctx.author.id, ctx.author.display_name)
+            p.energy = min(100, p.energy + int(fx["energy"]))
+            await repo.save_player(p)
+            await ctx.send(f"Used {d.name}: +{fx['energy']} energy.")
+        else:
+            await add_item(ctx.guild.id, ctx.author.id, item_id, 1)
+            await ctx.send("That isn't usable with `c!use`.")
+
+
 async def setup(bot):
     await bot.add_cog(Economy(bot))

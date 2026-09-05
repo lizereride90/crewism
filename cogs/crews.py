@@ -100,35 +100,34 @@ class Crews(commands.Cog):
         if not mine or mine.leader_id != interaction.user.id:
             await interaction.followup.send(embed=error_embed("Only crew leaders can declare war."))
             return
+        await self._run_war(interaction.guild_id, mine, enemy, interaction.followup.send)
+
+    async def _crew_power(self, gid: int, cid: int) -> int:
+        async with SessionLocal() as s2:
+            mems = (await s2.execute(select(CrewMember).where(CrewMember.crew_id == cid).limit(3))).scalars().all()
+        powers = []
+        for m in mems:
+            p = await repo.get_or_create_player(gid, m.user_id, "")
+            rows = await list_instances(gid, m.user_id)
+            tp = team_power([{"str": r.c_str, "spd": r.c_spd, "end": r.c_end, "tech": r.c_tech,
+                              "rarity": "Common", "faction": "", "style": "", "char_class": ""} for r in rows[:4]])
+            powers.append(p.p_str + p.p_spd + p.p_end + p.p_tech + tp // 10)
+        return crew_war_power(powers) if powers else 0
+
+    async def _run_war(self, gid: int, mine: Crew, enemy: str, send):
+        import random
         async with SessionLocal() as s:
-            r = await s.execute(select(Crew).where(Crew.guild_id == interaction.guild_id, Crew.name.ilike(enemy)))
+            r = await s.execute(select(Crew).where(Crew.guild_id == gid, Crew.name.ilike(enemy)))
             foe = r.scalars().first()
             if not foe or foe.id == mine.id:
-                await interaction.followup.send(embed=error_embed("Enemy not found."))
+                await send(embed=error_embed("Enemy not found."))
                 return
             s.expunge(foe)
-            # gather member powers (top 3 members each)
-            def _members(cid: int):
-                return s.execute(select(CrewMember).where(CrewMember.crew_id == cid))
-
-        async def power_of(cid: int) -> int:
-            async with SessionLocal() as s2:
-                mems = (await s2.execute(select(CrewMember).where(CrewMember.crew_id == cid).limit(3))).scalars().all()
-            powers = []
-            for m in mems:
-                p = await repo.get_or_create_player(interaction.guild_id, m.user_id, "")
-                rows = await list_instances(interaction.guild_id, m.user_id)
-                tp = team_power([{"str": r.c_str, "spd": r.c_spd, "end": r.c_end, "tech": r.c_tech,
-                                  "rarity": "Common", "faction": "", "style": "", "char_class": ""} for r in rows[:4]])
-                powers.append(p.p_str + p.p_spd + p.p_end + p.p_tech + tp // 10)
-            return crew_war_power(powers) if powers else 0
-
-        import random
-        mp, fp = await power_of(mine.id), await power_of(foe.id)
+        mp, fp = await self._crew_power(gid, mine.id), await self._crew_power(gid, foe.id)
         mp += random.randint(-50, 50)
         fp += random.randint(-50, 50)
         mine_won = mp >= fp
-        bt = await create_battle(interaction.guild_id, "crew_war", mine.id, foe.id)
+        bt = await create_battle(gid, "crew_war", mine.id, foe.id)
         await resolve_battle(bt.id, mine.id if mine_won else foe.id, {"mp": mp, "fp": fp})
         async with SessionLocal() as s:
             for cid, won in ((mine.id, mine_won), (foe.id, not mine_won)):
@@ -139,8 +138,81 @@ class Crews(commands.Cog):
                 else:
                     c.losses += 1
             await s.commit()
-        await interaction.followup.send(embed=embed(
-            f"{mine.name} {'WINS' if mine_won else 'LOSES'} vs {foe.name}", f"Power {mp} vs {fp}"))
+        await send(embed=embed(f"{mine.name} {'WINS' if mine_won else 'LOSES'} vs {foe.name}", f"Power {mp} vs {fp}"))
+
+    # ---- prefix mirrors (flat: c!crew_create, c!crew_info, ...) ----
+
+    @commands.command(name="crew_create")
+    async def crew_create_prefix(self, ctx: commands.Context, *, name: str):
+        if not is_valid_name(name, 48):
+            await ctx.send(embed=error_embed("Bad crew name."))
+            return
+        p = await repo.get_or_create_player(ctx.guild.id, ctx.author.id, ctx.author.display_name)
+        if p.crew_id:
+            await ctx.send("Already in a crew. Leave first.")
+            return
+        try:
+            c = await create_crew(ctx.guild.id, ctx.author.id, name, "")
+        except Exception:
+            await ctx.send(embed=error_embed("Name taken."))
+            return
+        await ctx.send(embed=crew_embed(c.name, c.tag, c.level, 0, 0, 1))
+
+    @commands.command(name="crew_info", aliases=["crewinfo", "crew"])
+    async def crew_info_prefix(self, ctx: commands.Context):
+        c = await my_crew(ctx.guild.id, ctx.author.id)
+        if not c:
+            await ctx.send("No crew. `c!crew_create <name>` or `c!crew_join <name>`.")
+            return
+        async with SessionLocal() as s:
+            n = (await s.execute(select(func.count()).select_from(CrewMember).where(CrewMember.crew_id == c.id))).scalar_one()
+        await ctx.send(embed=crew_embed(c.name, c.tag, c.level, c.reputation, c.treasury, n))
+
+    @commands.command(name="crew_join")
+    async def crew_join_prefix(self, ctx: commands.Context, *, name: str):
+        async with SessionLocal() as s:
+            r = await s.execute(select(Crew).where(Crew.guild_id == ctx.guild.id, Crew.name.ilike(name)))
+            c = r.scalars().first()
+            if not c:
+                await ctx.send("No such crew.")
+                return
+            cid = c.id
+            r = await s.execute(select(Player).where(Player.guild_id == ctx.guild.id, Player.user_id == ctx.author.id))
+            pl = r.scalar_one_or_none()
+            if pl and pl.crew_id:
+                await ctx.send("Leave your crew first.")
+                return
+            s.add(CrewMember(crew_id=cid, guild_id=ctx.guild.id, user_id=ctx.author.id))
+            if pl:
+                pl.crew_id = cid
+            await s.commit()
+        await ctx.send(f"Joined crew #{cid}.")
+
+    @commands.command(name="crew_leave")
+    async def crew_leave_prefix(self, ctx: commands.Context):
+        async with SessionLocal() as s:
+            r = await s.execute(select(Player).where(Player.guild_id == ctx.guild.id, Player.user_id == ctx.author.id))
+            pl = r.scalar_one_or_none()
+            if not pl or not pl.crew_id:
+                await ctx.send("Not in a crew.")
+                return
+            cid = pl.crew_id
+            pl.crew_id = None
+            m = (await s.execute(select(CrewMember).where(CrewMember.crew_id == cid,
+                                                          CrewMember.user_id == ctx.author.id))).scalar_one_or_none()
+            if m:
+                await s.delete(m)
+            await s.commit()
+        await ctx.send("Left crew.")
+
+    @commands.command(name="crew_war")
+    @commands.cooldown(1, 60, commands.BucketType.user)
+    async def crew_war_prefix(self, ctx: commands.Context, *, enemy: str):
+        mine = await my_crew(ctx.guild.id, ctx.author.id)
+        if not mine or mine.leader_id != ctx.author.id:
+            await ctx.send(embed=error_embed("Only crew leaders can declare war."))
+            return
+        await self._run_war(ctx.guild.id, mine, enemy, ctx.send)
 
 
 async def setup(bot):

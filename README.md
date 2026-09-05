@@ -60,21 +60,24 @@ Python 3.12+, `discord.py>=2.3`, `SQLAlchemy>=2.0`, `aiosqlite`,
 
 ## Commands
 
-| Area | Commands |
-|---|---|
-| Profile | `/profile /balance /daily /stats` |
-| Explore | `/explore` (Fight / Recruit / Run buttons) |
-| Fighters | `/collection /team /dex` |
-| Training | `/trainers /train /claim_train /mastery /bloodline` |
-| Shop | `/shop /buy /sell /inventory /use` |
-| Gamble | `/coinflip /dice /higherlower` |
-| PvP | `/fight` |
-| Boss | `/bosses /boss` |
-| Crew | `/crew create/join/info/leave/war` |
-| Turf | `/territories /conquer` |
-| Quests | `/quests /claim_quest /events /generations /workers` |
-| Ranks | `/leaderboard /bounty` |
-| Help | `/help` |
+Every slash command has a `c!` prefix twin (needs Message Content Intent enabled
+in the Developer Portal → Bot). Examples: `c!profile`, `c!explore`, `c!fight @user 100`.
+
+| Area | Slash | Prefix |
+|---|---|---|
+| Profile | `/profile /balance /daily /stats` | `c!profile c!balance c!daily c!stats` |
+| Explore | `/explore` (Fight / Recruit / Run buttons) | `c!explore` (same buttons) |
+| Fighters | `/collection /team /dex` | `c!collection c!team c!dex` |
+| Training | `/trainers /train /claim_train /mastery /bloodline` | same with `c!` |
+| Shop | `/shop /buy /sell /inventory /use` | same with `c!` |
+| Gamble | `/coinflip /dice /higherlower` | `c!coinflip c!dice c!higherlower` |
+| PvP | `/fight` | `c!fight @user <wager>` |
+| Boss | `/bosses /boss` | `c!bosses c!boss` |
+| Crew | `/crew create/join/info/leave/war` | `c!crew_create c!crew_join c!crew_info c!crew_leave c!crew_war` |
+| Turf | `/territories /conquer` | `c!territories c!conquer` |
+| Quests | `/quests /claim_quest /events /generations /workers` | same with `c!` |
+| Ranks | `/leaderboard /bounty` | `c!leaderboard c!bounty` |
+| Help | `/help` | `c!help` |
 
 ## Project structure
 

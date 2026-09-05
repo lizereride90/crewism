@@ -79,5 +79,63 @@ class Characters(commands.Cog):
         await interaction.response.send_message(embed=embed("Dex", txt), ephemeral=True)
 
 
+    # ---- prefix mirrors ----
+
+    @commands.command(name="collection", aliases=["crew_list", "box"])
+    async def collection_prefix(self, ctx: commands.Context):
+        rows = await list_instances(ctx.guild.id, ctx.author.id)
+        if not rows:
+            await ctx.send("Empty. Go `c!explore` and recruit.")
+            return
+        async with SessionLocal() as s:
+            lines = []
+            for inst in rows[:20]:
+                d = await s.get(CharacterDefinition, inst.def_id)
+                lines.append(f"#{inst.id} {d.name} [{d.rarity}] LV{inst.level} ({d.style})")
+            more = f"\n...+{len(rows)-20} more" if len(rows) > 20 else ""
+        await ctx.send(embed=embed("Collection", "\n".join(lines) + more))
+
+    @commands.command(name="team", aliases=["deck"])
+    async def team_prefix(self, ctx: commands.Context, *, ids: str = ""):
+        gid, uid = ctx.guild.id, ctx.author.id
+        t = await ensure_team(gid, uid)
+        if not ids.strip():
+            mems = await team_members(t.id)
+            if not mems:
+                await ctx.send("Team empty. `c!collection` for IDs, then `c!team 3,5`.")
+                return
+            async with SessionLocal() as s:
+                lines = []
+                for m in mems:
+                    inst = await s.get(CharacterInstance, m.instance_id)
+                    d = await s.get(CharacterDefinition, inst.def_id) if inst else None
+                    if d:
+                        lines.append(f"Slot {m.slot+1}: {d.name} LV{inst.level}")
+                await ctx.send(embed=embed(f"Team {t.name}", "\n".join(lines)))
+            return
+        try:
+            wanted = [int(x.strip()) for x in ids.split(",") if x.strip()][:4]
+        except ValueError:
+            await ctx.send(embed=error_embed("IDs must be numbers."))
+            return
+        owned = {r.id for r in await list_instances(gid, uid)}
+        if not set(wanted) <= owned:
+            await ctx.send(embed=error_embed("Some IDs aren't yours."))
+            return
+        await set_team(t.id, wanted)
+        await ctx.send(f"Team set: {wanted}")
+
+    @commands.command(name="dex")
+    async def dex_prefix(self, ctx: commands.Context, *, name: str):
+        async with SessionLocal() as s:
+            r = await s.execute(select(CharacterDefinition).where(CharacterDefinition.name.ilike(f"%{name}%")).limit(10))
+            rows = r.scalars().all()
+        if not rows:
+            await ctx.send("No match.")
+            return
+        txt = "\n".join(f"{d.name} [{d.rarity}] {d.style} • {d.faction} • Gen{d.generation} • {d.role}" for d in rows)
+        await ctx.send(embed=embed("Dex", txt))
+
+
 async def setup(bot):
     await bot.add_cog(Characters(bot))

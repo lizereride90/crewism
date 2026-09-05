@@ -23,6 +23,16 @@ def _combatant(p, team_bonus: int = 0) -> dict:
             "style": "Street Fighting", "abilities": []}
 
 
+async def _team_bonus(gid: int, uid: int) -> int:
+    try:
+        rows = await list_instances(gid, uid)
+        mems = [{"str": r.c_str, "spd": r.c_spd, "end": r.c_end, "tech": r.c_tech,
+                 "rarity": "Common", "faction": "", "style": "", "char_class": ""} for r in rows[:4]]
+        return team_power(mems) // 20 if mems else 0
+    except Exception:
+        return 0
+
+
 class Pvp(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -30,39 +40,41 @@ class Pvp(commands.Cog):
     @app_commands.command(name="fight", description="Challenge another fighter (1v1, optional wager)")
     @app_commands.describe(opponent="Who to fight", wager="Won wager (0 = friendly)")
     async def fight(self, interaction: discord.Interaction, opponent: discord.Member, wager: int = 0):
-        wager = clamp_amount(wager, 0, 10000) if wager else 0
         if opponent.id == interaction.user.id or opponent.bot:
             await interaction.response.send_message(embed=error_embed("Invalid opponent."), ephemeral=True)
             return
         await interaction.response.defer()
-        gid = interaction.guild_id
-        a = await repo.get_or_create_player(gid, interaction.user.id, interaction.user.display_name)
+        await self._run_fight(interaction.guild_id, interaction.user, opponent,
+                              wager, interaction.followup.send)
+
+
+    @commands.command(name="fight", aliases=["challenge", "vs"])
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def fight_prefix(self, ctx: commands.Context, opponent: discord.Member, wager: int = 0):
+        if opponent.id == ctx.author.id or opponent.bot:
+            await ctx.send(embed=error_embed("Mention a real opponent. `c!fight @user 100`"))
+            return
+        await self._run_fight(ctx.guild.id, ctx.author, opponent, wager, ctx.send)
+
+    async def _run_fight(self, gid, author, opponent, wager, send):
+        wager = clamp_amount(wager, 0, 10000) if wager else 0
+        a = await repo.get_or_create_player(gid, author.id, author.display_name)
         b = await repo.get_or_create_player(gid, opponent.id, opponent.display_name)
         if wager:
             if a.money < wager or b.money < wager:
-                await interaction.followup.send(embed=error_embed("Someone can't cover the wager."))
+                await send(embed=error_embed("Someone can't cover the wager."))
                 return
             try:
                 await add_money(gid, a.user_id, -wager, "pvp_stake", ref=f"vs{b.user_id}")
                 await add_money(gid, b.user_id, -wager, "pvp_stake", ref=f"vs{a.user_id}")
             except ValueError:
-                # refund challenger if second failed
                 try:
                     await add_money(gid, a.user_id, wager, "pvp_refund", ref="stake_fail")
                 except Exception:
                     pass
-                await interaction.followup.send(embed=error_embed("Wager failed."))
+                await send(embed=error_embed("Wager failed."))
                 return
-        # small team synergy bonus
-        async def bonus(uid: int) -> int:
-            try:
-                rows = await list_instances(gid, uid)
-                mems = [{"str": r.c_str, "spd": r.c_spd, "end": r.c_end, "tech": r.c_tech,
-                         "rarity": "Common", "faction": "", "style": "", "char_class": ""} for r in rows[:4]]
-                return team_power(mems) // 20 if mems else 0
-            except Exception:
-                return 0
-        ba, bb = await bonus(a.user_id), await bonus(b.user_id)
+        ba, bb = await _team_bonus(gid, a.user_id), await _team_bonus(gid, b.user_id)
         res = combat_service.simulate(_combatant(a, ba), _combatant(b, bb), seed=random.randint(1, 999999))
         a_won = res["winner_side"] == "A"
         bt = await create_battle(gid, "ranked" if wager else "friendly", a.user_id, b.user_id, wager)
@@ -79,14 +91,11 @@ class Pvp(commands.Cog):
                     row.losses += 1
             await s.commit()
         if wager:
-            pot = wager * 2
-            winner_id = a.user_id if a_won else b.user_id
-            await add_money(gid, winner_id, pot, "pvp_win", ref=f"battle:{bt.id}")
+            await add_money(gid, a.user_id if a_won else b.user_id, wager * 2, "pvp_win", ref=f"battle:{bt.id}")
         lines = "\n".join(res["log"][-8:])
         winner = a.name if a_won else b.name
-        e = embed(f"{winner} wins! {'(+'+str(wager*2)+' Won)' if wager else '(friendly)'}", lines,
-                  color=0x57F287 if a_won else 0xED4245)
-        await interaction.followup.send(embed=e)
+        await send(embed=embed(f"{winner} wins! {'(+'+str(wager*2)+' Won)' if wager else '(friendly)'}", lines,
+                               color=0x57F287 if a_won else 0xED4245))
 
 
 async def setup(bot):

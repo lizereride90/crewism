@@ -21,7 +21,7 @@ COGS = [
 class CrewismBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
-        intents.message_content = False
+        intents.message_content = True  # required for c! prefix commands
         super().__init__(command_prefix="c!", intents=intents)
 
 
@@ -73,6 +73,19 @@ async def on_ready():
         log.info("slash commands synced")
     except Exception as e:
         log.error("sync failed: %s", e)
+
+
+@bot.event
+async def on_command_error(ctx: commands.Context, error):
+    if isinstance(error, commands.CommandNotFound):
+        return
+    if isinstance(error, commands.CommandOnCooldown):
+        await ctx.send(f"Cooldown. Try again in {int(error.retry_after)}s.")
+    elif isinstance(error, (commands.BadArgument, commands.MissingRequiredArgument)):
+        await ctx.send("Bad arguments. Try `c!help`.")
+    else:
+        await ctx.send("Something broke. Try again.")
+    log.warning("prefix error: %r", error)
 
 
 @bot.tree.error
